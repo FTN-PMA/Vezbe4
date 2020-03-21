@@ -14,9 +14,8 @@ import rs.reviewer.R;
 import java.util.ArrayList;
 
 public class DrawerListAdapter extends BaseAdapter {
-	 
-    Context mContext;
-    ArrayList<NavItem> mNavItems;
+    private Context mContext;
+    private ArrayList<NavItem> mNavItems;
  
     public DrawerListAdapter(Context context, ArrayList<NavItem> navItems) {
         mContext = context;
