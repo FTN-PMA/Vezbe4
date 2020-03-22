@@ -4,7 +4,6 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -12,7 +11,6 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.ActionBarDrawerToggle;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
@@ -28,10 +26,8 @@ public class MainActivity extends AppCompatActivity {
     private ListView mDrawerList;
     private ActionBarDrawerToggle mDrawerToggle;
     private RelativeLayout mDrawerPane;
-    private CharSequence mDrawerTitle;
     private CharSequence mTitle;
     private ArrayList<NavItem> mNavItems = new ArrayList<NavItem>();
-    private AlertDialog dialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,21 +36,24 @@ public class MainActivity extends AppCompatActivity {
         
         prepareMenu(mNavItems);
         
-        mTitle = mDrawerTitle = getTitle();
-        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
-        mDrawerList = (ListView) findViewById(R.id.navList);
-        
-        // Populate the Navigtion Drawer with options
-        mDrawerPane = (RelativeLayout) findViewById(R.id.drawerPane);
+        mTitle = getTitle();
+        mDrawerLayout = findViewById(R.id.drawerLayout);
+        mDrawerList = findViewById(R.id.navList);
+
+        mDrawerPane = findViewById(R.id.drawerPane);
         DrawerListAdapter adapter = new DrawerListAdapter(this, mNavItems);
         
-        // set a custom shadow that overlays the main content when the drawer opens
+        // postavljamo senku koja preklama glavni sadrzaj
         mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
+        // dodajemo listener koji ce reagovati na klik pojedinacnog elementa u listi
         mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
+        // drawer-u postavljamo unapred definisan adapter
         mDrawerList.setAdapter(adapter);
 
-        // enable ActionBar app icon to behave as action to toggle nav drawer
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        // Specificiramo da kada se drawer zatvori prikazujemo jednu ikonu
+        // kada se drawer otvori drugu. Za to je potrebo da ispranvo povezemo
+        // Toolbar i ActionBar
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         final ActionBar actionBar = getSupportActionBar();
 
@@ -65,15 +64,11 @@ public class MainActivity extends AppCompatActivity {
             actionBar.setHomeButtonEnabled(true);
         }
 
-
-//        getActionBar().setDisplayHomeAsUpEnabled(true);
-//        getActionBar().setHomeButtonEnabled(true);
-
-        // ActionBarDrawerToggle ties together the the proper interactions
-        // between the sliding drawer and the action bar app icon
-
-        // OVO NE MORA DA SE KORISTI, UKOLIKO SE NE KORISTI
-        // ONDA SE NE MENJA TEKST PRILIKOM OPEN CLOSE DRAWERA POGLEDATI JOS
+        /*
+        * drawer-u specificiramo za koju referencu toolbar-a da se veze
+        * Specificiramo sta ce da pise unutar Toolbar-a kada se drawer otvori/zatvori
+        * i specificiramo sta ce da se desava kada se drawer otvori/zatvori.
+        * */
         mDrawerToggle = new ActionBarDrawerToggle(
                 this,                  /* host Activity */
                 mDrawerLayout,         /* DrawerLayout object */
@@ -82,19 +77,17 @@ public class MainActivity extends AppCompatActivity {
                 R.string.drawer_close  /* "close drawer" description for accessibility */
                 ) {
             public void onDrawerClosed(View view) {
-//                getActionBar().setTitle(mTitle);
                 getSupportActionBar().setTitle(mTitle);
                 invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
             }
 
             public void onDrawerOpened(View drawerView) {
-//                getActionBar().setTitle(mDrawerTitle);
                 getSupportActionBar().setTitle("iReviewer");
                 invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
             }
         };
-//        mDrawerLayout.setDrawerListener(mDrawerToggle);
 
+        // Izborom na neki element iz liste, pokrecemo akciju
         if (savedInstanceState == null) {
             selectItemFromDrawer(0);
         }
@@ -116,7 +109,6 @@ public class MainActivity extends AppCompatActivity {
     
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
         return super.onCreateOptionsMenu(menu);
     }
 

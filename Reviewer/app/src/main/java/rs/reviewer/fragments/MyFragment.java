@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.Toast;
+import androidx.annotation.NonNull;
 import androidx.fragment.app.ListFragment;
 import model.Cinema;
 import rs.reviewer.R;
@@ -18,13 +19,8 @@ import rs.reviewer.tools.Mokap;
 
 public class MyFragment extends ListFragment {
 
-    public static String USER_KEY = "rs.reviewer.USER_KEY";
-
 	public static MyFragment newInstance() {
-		
-		MyFragment mpf = new MyFragment();
-		
-		return mpf;
+        return new MyFragment();
 	}
 
 	@Override
@@ -39,6 +35,14 @@ public class MyFragment extends ListFragment {
 
         Cinema cinema = Mokap.getCinemas().get(position);
 
+        /*
+        * Ako nasoj aktivnosti zelimo da posaljemo nekakve podatke
+        * za to ne treba da koristimo konstruktor. Treba da iskoristimo
+        * identicnu strategiju koju smo koristili kda smo radili sa
+        * fragmentima! Koristicemo Bundle za slanje podataka. Tacnije
+        * intent ce formirati Bundle za nas, ali mi treba da pozovemo
+        * odgovarajucu putExtra metodu.
+        * */
         Intent intent = new Intent(getActivity(), DetailActivity.class);
         intent.putExtra("name", cinema.getName());
         intent.putExtra("descr", cinema.getDescription());
@@ -55,13 +59,31 @@ public class MyFragment extends ListFragment {
         setListAdapter(adapter);
     }
 
+    /*
+    * Ako zelimo da nasa aktivnost/fragment prikaze ikonice unutar toolbar-a
+    * to se odvija u nekoliko koraka. potrebno je da napravimo listu koja
+    * specificira koje sve ikonice imamo unutar menija, koje ikone koristimo
+    * i da li se uvek prikazuju ili ne. Nakon toga koristeci metdu onCreateOptionsMenu
+    * postavljamo ikone na toolbar.
+    * */
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
+
+        // ovo korostimo ako je nasa arhitekrura takva da imamo jednu aktivnost
+        // i vise fragmentaa gde svaki od njih ima svoj menu unutar toolbar-a
         menu.clear();
-        getActivity().getMenuInflater().inflate(R.menu.activity_itemdetail, menu);
+        inflater.inflate(R.menu.activity_itemdetail, menu);
     }
 
+    /*
+    * Da bi znali na koju ikonicu je korisnik kliknuo
+    * treba da iskoristimo jedinstveni identifikator
+    * za svaki element u listi. Metoda onOptionsItemSelected
+    * ce vratiti MenuItem na koji je korisnik kliknuo. Ako znamo
+    * da ce on vratiti i id, tacno znamo na koji element je korisnik
+    * kliknuo, i shodno tome reagujemo.
+    * */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
